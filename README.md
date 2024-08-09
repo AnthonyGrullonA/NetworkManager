@@ -44,7 +44,7 @@ pip install requests
 Clona el repositorio en tu máquina local:
 
 ```bash
-git clone https://github.com/AnthonyGrullonA/NetworkMonitor.git
+git clone https://github.com/AnthonyGrullonA/NetworkManager.git
 cd monitor-red
 ```
 
