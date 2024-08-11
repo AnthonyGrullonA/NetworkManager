@@ -5,12 +5,19 @@ import time
 import signal
 from datetime import datetime, timedelta
 import requests
-import msvcrt  # Importar msvcrt para manejar la entrada del teclado en Windows
+
+import platform  # Importar la libreria platform para obtener el sistema operativo
 
 # Limpiar consola
-os.system("cls")
 
+def clear():
+    if os.name =="nt":
+        os.system("cls")
+    else:
+        os.system("clear")   
+clear()
 # Variables iniciales
+system = ""
 target = "8.8.8.8"  # IP o dominio que deseas monitorear
 timeout_count = 0
 packet_loss_count = 0
@@ -21,8 +28,14 @@ successful_pings = 0  # Variable para contar los pings exitosos
 total_downtime_seconds = 0  # Variable para acumular tiempo sin internet
 
 
+# What OS operating system is running?
+def get_system():
+    system = platform.system()
+
+
 # Funcion para obtener IP publica y proveedor
 def get_public_ip_info():
+    get_system()
     try:
         response = requests.get("https://ipinfo.io")
         data = response.json()
@@ -117,6 +130,15 @@ def signal_handler(sig, frame):
     print_and_save_report()
     os._exit(0)
 
+def press_enter():
+    if system == 'Windows':
+        import msvcrt # Importar msvcrt para manejar la entrada del teclado en Windows
+        if msvcrt.kbhit() and msvcrt.getch() == b'\r':
+            print_and_save_report()
+
+    elif system == 'Linux':
+        if sys.stdin.read(1) in ['\r', '\n']:
+            print_and_save_report()
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -146,9 +168,8 @@ try:
             if not timeout_start:
                 timeout_start = datetime.now()
 
-        # Comprobar si se ha presionado Enter
-        if msvcrt.kbhit() and msvcrt.getch() == b"\r":
-            print_and_save_report()
+        # Comprobar si se ha presionado Enter & generar reporte
+        press_enter() 
 
         time.sleep(1)
 
